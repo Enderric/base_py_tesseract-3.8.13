@@ -1,0 +1,20 @@
+stages:
+  - build
+  - publish
+
+build:
+  stage: build
+  tags:
+    - docker
+  script:
+    - docker build . --build-arg PY_VERS_NEW="3.8.13" --build-arg LIBGTK20_DEV="libgtk2.0-dev" --build-arg FFMPEG="ffmpeg" --build-arg LIBSM6="libsm6" --build-arg LIBXEXT6="libxext6" --build-arg POPPLER-UTILS="true" --build-arg BUILD-ESSENTIAL="build-essential" --build-arg LIBZBAR-DEV="libzbar-dev" --build-arg GIT="git"  --build-arg G2PLUS="g++" --build-arg TESSERACT="tesseract-ocr" -t $DOCKERHUB/base_py_tesseract-3.8.13:$CI_COMMIT_REF_SLUG-$CI_PIPELINE_ID
+    - docker push $DOCKERHUB/base_py_tesseract-3.8.13:$CI_COMMIT_REF_SLUG-$CI_PIPELINE_ID
+
+publish:
+  stage: publish
+  tags:
+    - docker
+  script:
+    - docker pull $DOCKERHUB/base_py_tesseract-3.8.13:$CI_COMMIT_REF_SLUG-$CI_PIPELINE_ID
+    - docker tag $DOCKERHUB/base_py_tesseract-3.8.13:$CI_COMMIT_REF_SLUG-$CI_PIPELINE_ID $DOCKERHUB/base_py_tesseract-3.8.13:latest
+    - docker push $DOCKERHUB/base_py_tesseract-3.8.13:latest
